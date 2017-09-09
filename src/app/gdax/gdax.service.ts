@@ -5,6 +5,9 @@ import { Http, Response, RequestOptionsArgs, URLSearchParams } from '@angular/ht
 // rxjs imports
 import { Observable } from 'rxjs/Observable';
 
+// models
+import { Candle } from './../models/models';
+
 const server = 'https://api.gdax.com';
 
 @Injectable()
@@ -18,6 +21,16 @@ export class GDAX {
     /**/
   }
 
+  private convertToCandle(response: Array<Array<number>>): Array<Candle> {
+    const returnValue: Array<Candle> = [];
+    for (const candle of response) {
+      if (candle.length === 6) {
+        returnValue.push(new Candle(candle));
+      }
+    }
+
+    return returnValue;
+  }
 
   /*
     endpoint: GET /products/<product id>/candles
@@ -28,16 +41,16 @@ export class GDAX {
 
     max number of candles is 200 (per request)
 
-    response: {
+    response: [
       time:   <start time>,
       low:    <low price>,
       high:   <high price>,
       open:   <open price>,
       close:  <close price>,
       volume: <volume for single slice>
-    }
+    ]
   */
-  getHistoricRates(productId: string, start: string, end: string, granularity: number): Observable<any> {
+  getHistoricRates(productId: string, start: string, end: string, granularity: number): Observable<Array<Candle>> {
     const endpoint: string = server + '/products/' + productId + '/candles';
     const params: URLSearchParams = new URLSearchParams();
     params.set('start', start);
@@ -52,22 +65,30 @@ export class GDAX {
     return new Observable((obs) => {
       this.http.get(endpoint, requestOptions).subscribe((response: Response) => {
         if (response && response.json) {
-          obs.next(response.json());
+          obs.next(this.convertToCandle(response.json()));
         } else {
-          obs.next(null);
+          obs.next([]);
         }
         obs.complete();
       });
     });
   }
 
-  getEthHistory(granularity: number): Observable<any> {
+  getHistory(productId: string, granularity: number): Observable<Array<Candle>> {
     const d: Date = new Date();
     const end: string = d.toISOString();
     const start: string = (new Date(((d.valueOf() / 1000) - (200 * granularity)) * 1000)).toISOString();
     console.log(start);
     console.log(end);
 
-    return this.getHistoricRates('ETH-USD', start, end, granularity);
+    return this.getHistoricRates(productId, start, end, granularity);
+  }
+
+  getEthHistory(granularity: number): Observable<Array<Candle>> {
+    return this.getHistory('ETH-USD', granularity);
+  }
+
+  getBtcHistory(granularity: number): Observable<Array<Candle>> {
+    return this.getHistory('ETH-USD', granularity);
   }
 }
