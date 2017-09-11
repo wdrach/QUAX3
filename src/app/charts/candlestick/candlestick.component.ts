@@ -21,14 +21,14 @@ export class CandlestickComponent implements OnInit {
 
   ngOnInit() {
     this.gdax.getEthHistory(15 * 60).subscribe((data) => {
-      const x:     Array<number> = [];
+      const x:     Array<string> = [];
       const close: Array<number> = [];
       const high:  Array<number> = [];
       const low:   Array<number> = [];
       const open:  Array<number> = [];
 
       for (const entry of data) {
-        x.push(entry.time);
+        x.push((new Date(entry.time * 1000).toISOString()));
         close.push(entry.close);
         high.push(entry.high);
         low.push(entry.low);
@@ -57,22 +57,20 @@ export class CandlestickComponent implements OnInit {
           b: 40,
           l: 60
         },
-        showlegend: false/*,
+        showlegend: false,
         xaxis: {
           autorange: true,
           domain: [0, 1],
-          range: ['2017-01-03 12:00', '2017-02-15 12:00'],
-          rangeslider: {range: ['2017-01-03 12:00', '2017-02-15 12:00']},
+          rangeslider: {range: [x[0], x[x.length - 1]]},
           title: 'Date',
           type: 'date'
         },
         yaxis: {
           autorange: true,
           domain: [0, 1],
-          range: [114.609999778, 137.410004222],
+          range: [Math.min(...low), Math.max(...high)],
           type: 'linear'
         }
-        */
       }
       Plotly.plot('plotly-div', drawData, layout);
     });
