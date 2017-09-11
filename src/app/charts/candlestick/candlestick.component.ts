@@ -1,6 +1,9 @@
 // angular imports
 import { Component, OnInit } from '@angular/core';
 
+// primeng imports
+import { SelectItem } from 'primeng/primeng';
+
 // local imports
 import { GDAX } from '../../gdax/gdax.service';
 
@@ -13,14 +16,32 @@ declare var Plotly: any;
   providers: [GDAX]
 })
 export class CandlestickComponent implements OnInit {
+  timeIntervals: Array<SelectItem>;
+  selectedInterval: number;
+
   constructor(
     private gdax: GDAX
   ) {
-    /**/
+    this.timeIntervals = [
+      {label: '1m', value: 60},
+      {label: '15m', value: 15 * 60},
+      {label: '1h', value: 60 * 60},
+      {label: '6h', value: 6 * 60 * 60},
+      {label: '1d', value: 24 * 60 * 60},
+      {label: '1w', value: 7 * 24 * 60 * 60}
+    ]
   }
 
   ngOnInit() {
-    this.gdax.getEthHistory(15 * 60).subscribe((data) => {
+    this.plot(60);
+  }
+
+  intervalChange(e: any) {
+    this.plot(e.value);
+  }
+
+  plot(granularity: number) {
+    this.gdax.getEthHistory(granularity).subscribe((data) => {
       const x:     Array<string> = [];
       const close: Array<number> = [];
       const high:  Array<number> = [];
@@ -85,8 +106,7 @@ export class CandlestickComponent implements OnInit {
           type: 'date'
         },
       }
-      Plotly.plot('plotly-div', drawData, layout);
+      Plotly.newPlot('plotly-div', drawData, layout);
     });
-
   }
 }
