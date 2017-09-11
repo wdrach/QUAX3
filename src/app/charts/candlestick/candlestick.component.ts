@@ -26,6 +26,7 @@ export class CandlestickComponent implements OnInit {
       const high:  Array<number> = [];
       const low:   Array<number> = [];
       const open:  Array<number> = [];
+      const y:     Array<number> = [];
 
       for (const entry of data) {
         x.push((new Date(entry.time * 1000).toISOString()));
@@ -33,9 +34,16 @@ export class CandlestickComponent implements OnInit {
         high.push(entry.high);
         low.push(entry.low);
         open.push(entry.open);
+        y.push(entry.volume);
       }
 
       const drawData = [{
+        x: x,
+        y: y,
+        type: 'bar',
+        xaxis: 'x',
+        yaxis: 'y'
+      }, {
         x: x,
         close: close,
         high: high,
@@ -43,7 +51,7 @@ export class CandlestickComponent implements OnInit {
         open: open,
         type: 'candlestick',
         xaxis: 'x',
-        yaxis: 'y',
+        yaxis: 'y2',
         decreasing: {line: {color: '#E74C3C'}},
         increasing: {line: {color: '#2ECC71'}},
         line: {color: '606060'}
@@ -54,20 +62,28 @@ export class CandlestickComponent implements OnInit {
         margin: {
           r: 10,
           t: 25,
-          b: 40,
+          b: 10,
           l: 60
         },
         showlegend: false,
+        yaxis: {
+          autorange: true,
+          type: 'linear',
+          title: 'Volume',
+          domain: [0, .25]
+        },
+        yaxis2: {
+          autorange: true,
+          type: 'linear',
+          title: 'Price',
+          domain: [.25, 1],
+          anchor: 'y2'
+        },
         xaxis: {
           autorange: true,
           title: 'Date',
           type: 'date'
         },
-        yaxis: {
-          autorange: true,
-          type: 'linear',
-          title: 'Price'
-        }
       }
       Plotly.plot('plotly-div', drawData, layout);
     });
