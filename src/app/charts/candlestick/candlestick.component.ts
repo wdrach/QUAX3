@@ -60,16 +60,13 @@ export class CandlestickComponent implements OnInit {
         showlegend: false,
         xaxis: {
           autorange: true,
-          domain: [0, 1],
-          rangeslider: {range: [x[0], x[x.length - 1]]},
           title: 'Date',
           type: 'date'
         },
         yaxis: {
           autorange: true,
-          domain: [0, 1],
-          range: [Math.min(...low), Math.max(...high)],
-          type: 'linear'
+          type: 'linear',
+          title: 'Price'
         }
       }
       Plotly.plot('plotly-div', drawData, layout);
