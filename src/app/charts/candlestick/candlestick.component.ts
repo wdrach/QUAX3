@@ -83,7 +83,7 @@ export class CandlestickComponent implements OnInit {
         margin: {
           r: 10,
           t: 25,
-          b: 10,
+          b: 60,
           l: 60
         },
         showlegend: false,
@@ -106,7 +106,7 @@ export class CandlestickComponent implements OnInit {
           type: 'date'
         },
       }
-      Plotly.newPlot('plotly-div', drawData, layout);
+      Plotly.newPlot('candlestick', drawData, layout);
     });
   }
 }

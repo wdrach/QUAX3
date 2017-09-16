@@ -11,11 +11,13 @@ import { DropdownModule } from 'primeng/primeng';
 // local component imports
 import { AppComponent } from './app.component';
 import { CandlestickComponent } from './charts/candlestick/candlestick.component';
+import { DepthChartComponent } from './charts/depth-chart/depth-chart.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    CandlestickComponent
+    CandlestickComponent,
+    DepthChartComponent
   ],
   imports: [
     BrowserModule,

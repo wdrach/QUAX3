@@ -91,4 +91,49 @@ export class GDAX {
   getBtcHistory(granularity: number): Observable<Array<Candle>> {
     return this.getHistory('ETH-USD', granularity);
   }
+
+    /*
+    endpoint: GET  /products/<productId>/book?level=<level>
+    params:
+      * level:
+        - 1: get only the best bid/ask
+        - 2: get top 50
+        - 3: get all
+
+    response: {
+      sequence: <level>,
+      bids: [
+        [<price>, <size>, <order id>]
+      ],
+      asks: [
+        [<price>, <size>, <order id>]
+      ]
+    }
+  */
+  getOrderBook(productId: string, level: number): Observable<any> {
+    const endpoint: string = server + '/products/' + productId + '/book';
+    const params: URLSearchParams = new URLSearchParams();
+    params.set('level', level.toString());
+
+    const requestOptions: RequestOptionsArgs = {
+      url: endpoint,
+      params: params
+    };
+
+    return new Observable((obs) => {
+      this.http.get(endpoint, requestOptions).subscribe((response: Response) => {
+        if (response && response.json) {
+          const res = response.json();
+          obs.next({bids: res.bids, asks: res.asks});
+        } else {
+          obs.next({bids: [], asks: []});
+        }
+        obs.complete();
+      });
+    });
+  }
+
+  getEthDepth(full?: boolean): Observable<any> {
+    return full ? this.getOrderBook('ETH-USD', 3) : this.getOrderBook('ETH-USD', 2);
+  }
 }
